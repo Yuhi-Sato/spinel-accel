@@ -1,0 +1,11 @@
+Run options: --seed 6850
+
+# Running:
+
+.............../gem/test/kernel_test.rb:70: warning: method redefined; discarding old native_method
+/gem/test/kernel_test.rb:66: warning: previous definition of native_method was here
+....
+
+Finished in 10.456256s, 1.8171 runs/s, 16.8320 assertions/s.
+
+19 runs, 176 assertions, 0 failures, 0 errors, 0 skips

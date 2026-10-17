@@ -1,0 +1,6 @@
+.git
+.spinel_accel
+pkg
+tmp/*
+!tmp/native-test-bundles/
+!tmp/native-test-bundles/**

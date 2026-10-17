@@ -1,0 +1,4 @@
+/.spinel_accel/
+/pkg/
+/tmp/
+/Gemfile.lock
