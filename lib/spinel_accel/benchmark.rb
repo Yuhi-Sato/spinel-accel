@@ -9,8 +9,12 @@ module SpinelAccel
     def run(warmup: 50, rounds: 7, target_ms: 30)
       raise ConfigurationError, 'warmup >= 0, rounds >= 3, and target_ms > 0 required' unless warmup >= 0 && rounds >= 3 && target_ms > 0
       @kernel.check!
+      # Timing inputs may differ from the correctness samples, so confirm
+      # they agree before measuring them.
+      @kernel.bench_inputs.each { |entry, cases| cases.each { |args| @kernel.call(entry, *args, mode: :verify) } }
       rows = @kernel.entries.map do |entry, _|
-        cases = @kernel.samples.fetch(entry)
+        workload = @kernel.bench_inputs.key?(entry) ? 'bench_inputs' : 'samples'
+        cases = workload == 'bench_inputs' ? @kernel.bench_inputs.fetch(entry) : @kernel.samples.fetch(entry)
         iterations = %w[ruby native].to_h do |mode|
           warmup.times { |i| @kernel.call(entry, *cases[i % cases.length], mode: mode) }
           started = clock
@@ -29,7 +33,7 @@ module SpinelAccel
           end
         end
         medians = samples.transform_values { |values| values.sort[values.length / 2] }
-        { 'entry' => entry, 'samples_us' => samples, 'median_us' => medians,
+        { 'entry' => entry, 'workload' => workload, 'samples_us' => samples, 'median_us' => medians,
           'speedup' => medians['ruby'] / medians['native'], 'iterations' => iterations }
       end
       { 'kernel' => @kernel.name, 'fingerprint' => @kernel.fingerprint, 'abi' => SpinelAccel.abi,

@@ -85,6 +85,61 @@ class KernelTest < Minitest::Test
     end
   end
 
+  def test_array_validators_keep_element_rules
+    c = SpinelAccel::Contract
+    assert c.valid?('integer_array', [-(1 << 62), 0, (1 << 62) - 1])
+    refute c.valid?('integer_array', [0, 1 << 62])
+    refute c.valid?('integer_array', [-(1 << 62) - 1])
+    refute c.valid?('integer_array', [1, 1.0])
+    refute c.valid?('integer_array', [[1]])
+    assert c.valid?('float_array', [Float::MAX, Float::MAX])
+    refute c.valid?('float_array', [1.0, 1])
+    [[Float::NAN], [1.0, Float::NAN, 2.0], [Float::INFINITY, 1.0], [Float::INFINITY, -Float::INFINITY], [-Float::INFINITY]].each do |values|
+      refute c.valid?('float_array', values), values.inspect
+    end
+    assert c.valid?('string_array', ['a', '椅子'])
+    refute c.valid?('string_array', ['a', Class.new(String).new('b')])
+    refute c.valid?('string_array', ["a\0"])
+    e = assert_raises(SpinelAccel::ContractError) { TestKernels::ARITHMETIC.call(:sum, [1, 'x']) }
+    assert_equal 'sum argument 0 must be integer_array', e.message
+  end
+
+  def test_methods_are_resolved_once_per_kernel
+    k = TestKernels::ARITHMETIC
+    assert_same k.ruby_method(:sum), k.ruby_method('sum')
+    assert_raises(SpinelAccel::ConfigurationError) { k.ruby_method(:missing) }
+  end
+
+  def test_default_mode_is_fixed_at_registration
+    make = ->(**options) do
+      SpinelAccel::Kernel.new(name: 'mode', source: TestKernels::ARITHMETIC.source, module_name: 'ExampleArithmetic',
+        cache_dir: Dir.mktmpdir, entries: { sum: { params: [:integer_array], returns: :integer } }, **options)
+    end
+    assert_raises(SpinelAccel::ArtifactError) { make.call(mode: 'native').call(:sum, [1]) }
+    assert_equal 1, make.call(mode: :native).call(:sum, [1], mode: :ruby)
+    assert_raises(SpinelAccel::ConfigurationError) { make.call(mode: 'auto') }
+  end
+
+  def test_bench_inputs_are_validated_and_used_by_benchmark
+    make = ->(inputs) do
+      SpinelAccel::Kernel.new(name: 'bench', source: TestKernels::ARITHMETIC.source, module_name: 'ExampleArithmetic',
+        entries: { sum: { params: [:integer_array], returns: :integer } }, samples: { sum: [[[1]]] }, bench_inputs: inputs)
+    end
+    assert_raises(SpinelAccel::ConfigurationError) { make.call(missing: [[[1]]]) }
+    assert_raises(SpinelAccel::ConfigurationError) { make.call(sum: [[['x']]]) }
+    assert_raises(SpinelAccel::ConfigurationError) { make.call(sum: [[]]) }
+    inputs = [[Array.new(64) { |i| i }], [[]], [[5]]]
+    k = make.call(sum: inputs)
+    assert k.bench_inputs['sum'].frozen?
+    k.define_singleton_method(:native_method) { |entry| ruby_method(entry) }
+    row = SpinelAccel::Benchmark.new(k).run(warmup: 1, rounds: 3, target_ms: 1).fetch('results').first
+    assert_equal 'bench_inputs', row.fetch('workload')
+    assert row.fetch('iterations').values.all? { |count| count % inputs.length == 0 }
+    # A wrong native result on a benchmark input is rejected before timing.
+    k.define_singleton_method(:native_method) { |_entry| ->(values) { values.length == 64 ? -1 : values.sum } }
+    assert_raises(SpinelAccel::Mismatch) { SpinelAccel::Benchmark.new(k).run(warmup: 1, rounds: 3, target_ms: 1) }
+  end
+
   def test_subprocess_timeout_and_nonzero_exit_are_visible
     r = SpinelAccel::Command.run([RbConfig.ruby, '-e', '$stdout.sync=true; puts "ready"; sleep 20'], timeout: 0.2)
     assert r['timeout']

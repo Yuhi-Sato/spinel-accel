@@ -19,4 +19,10 @@ SpinelAccel.register :distances,
       [Array.new(4096) { |i| (i * 37) % 2001 - 1000 },
        Array.new(4096) { |i| (i * 19) % 2001 - 1000 }, 100, -100]
     ]
+  },
+  bench_inputs: {
+    distances: [
+      [Array.new(4096) { |i| (i * 37) % 2001 - 1000 },
+       Array.new(4096) { |i| (i * 19) % 2001 - 1000 }, 100, -100]
+    ]
   }
