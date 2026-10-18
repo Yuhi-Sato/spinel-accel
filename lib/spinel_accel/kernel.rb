@@ -17,34 +17,15 @@ module SpinelAccel
       end
       @source = File.expand_path(source).freeze
       @source_text = File.read(@source).freeze
-      @entries = entries.to_h.sort_by { |key, _| key.to_s }.to_h do |key, value|
-        method = key.to_s.dup.freeze
-        raise ConfigurationError, "invalid entry: #{method}" unless method.match?(/\A[a-z_]\w*\z/)
-        spec = value.transform_keys(&:to_sym)
-        [method, { 'params' => spec.fetch(:params).map { |t| Contract.validate_type!(t) }.freeze,
-                   'returns' => Contract.validate_type!(spec.fetch(:returns)) }.freeze]
-      end.freeze
-      raise ConfigurationError, 'entries cannot be empty' if @entries.empty?
-      @samples = samples.to_h.to_h do |key, cases|
-        [key.to_s.dup.freeze, cases.map { |args| Contract.frozen_copy(args) }.freeze]
-      end.freeze
-      @bench_inputs = bench_inputs.to_h.to_h do |key, cases|
-        entry = key.to_s.dup.freeze
-        spec = @entries.fetch(entry) { raise ConfigurationError, "bench_inputs for unknown entry: #{entry}" }
-        cases.each do |args|
-          unless args.length == spec['params'].length && spec['params'].zip(args).all? { |type, value| Contract.valid?(type, value) }
-            raise ConfigurationError, "bench_inputs for #{entry} do not match its params"
-          end
-        end
-        [entry, cases.map { |args| Contract.frozen_copy(args) }.freeze]
-      end.freeze
+      @entries = normalize_entries(entries)
+      @samples = normalize_samples(samples)
+      @bench_inputs = normalize_bench_inputs(bench_inputs)
       @mode = mode.to_s.dup.freeze
       raise ConfigurationError, "unknown mode: #{@mode}" unless MODES.include?(@mode)
       # Symbol and String keys both resolve without allocating on each call.
       @lookup = with_symbol_keys(@entries.to_h { |key, spec| [key, [key, spec].freeze] })
       @cache_dir = File.expand_path(cache_dir).freeze
-      @fingerprint = Digest::SHA256.hexdigest(JSON.generate({ 'gem' => VERSION, 'pin' => PIN,
-        'name' => @name, 'source' => Digest::SHA256.hexdigest(@source_text), 'module' => @module_name, 'entries' => @entries })).freeze
+      @fingerprint = compute_fingerprint
       @mutex = Mutex.new
     end
 
@@ -115,6 +96,42 @@ module SpinelAccel
 
     private
 
+    def normalize_entries(entries)
+      normalized = entries.to_h.sort_by { |key, _| key.to_s }.to_h do |key, value|
+        method = key.to_s.dup.freeze
+        raise ConfigurationError, "invalid entry: #{method}" unless method.match?(/\A[a-z_]\w*\z/)
+        spec = value.transform_keys(&:to_sym)
+        [method, { 'params' => spec.fetch(:params).map { |t| Contract.validate_type!(t) }.freeze,
+                   'returns' => Contract.validate_type!(spec.fetch(:returns)) }.freeze]
+      end.freeze
+      raise ConfigurationError, 'entries cannot be empty' if normalized.empty?
+      normalized
+    end
+
+    def normalize_samples(samples)
+      samples.to_h.to_h do |key, cases|
+        [key.to_s.dup.freeze, cases.map { |args| Contract.frozen_copy(args) }.freeze]
+      end.freeze
+    end
+
+    def normalize_bench_inputs(bench_inputs)
+      bench_inputs.to_h.to_h do |key, cases|
+        entry = key.to_s.dup.freeze
+        spec = @entries.fetch(entry) { raise ConfigurationError, "bench_inputs for unknown entry: #{entry}" }
+        cases.each do |args|
+          unless args.length == spec['params'].length && spec['params'].zip(args).all? { |type, value| Contract.valid?(type, value) }
+            raise ConfigurationError, "bench_inputs for #{entry} do not match its params"
+          end
+        end
+        [entry, cases.map { |args| Contract.frozen_copy(args) }.freeze]
+      end.freeze
+    end
+
+    def compute_fingerprint
+      Digest::SHA256.hexdigest(JSON.generate({ 'gem' => VERSION, 'pin' => PIN,
+        'name' => @name, 'source' => Digest::SHA256.hexdigest(@source_text), 'module' => @module_name, 'entries' => @entries })).freeze
+    end
+
     def with_symbol_keys(hash)
       hash.merge(hash.transform_keys(&:to_sym)).freeze
     end
@@ -173,14 +190,18 @@ module SpinelAccel
       expected = outcome(ruby_method(key), spec, copies[0])
       actual = outcome(native_method(key), spec, copies[1])
       raise MutationError, "#{name}.#{key} mutated its inputs" unless copies.all? { |copy| Contract.equal?(copy, args) }
-      same = expected[0] == actual[0] && if expected[0] == :error
-        expected[1].class == actual[1].class && expected[1].message == actual[1].message
-      else
-        Contract.equal?(expected[1], actual[1])
-      end
-      raise Mismatch, "#{name}.#{key}: Ruby and native results differ" unless same
-      raise expected[1] if expected[0] == :error
+      raise Mismatch, "#{name}.#{key}: Ruby and native results differ" unless same_outcome?(expected, actual)
+      kind, payload = expected
+      raise payload if kind == :error
       actual[1]
+    end
+
+    def same_outcome?(expected, actual)
+      expected_kind, expected_payload = expected
+      actual_kind, actual_payload = actual
+      return false unless expected_kind == actual_kind
+      return Contract.equal?(expected_payload, actual_payload) unless expected_kind == :error
+      expected_payload.class == actual_payload.class && expected_payload.message == actual_payload.message
     end
   end
 end

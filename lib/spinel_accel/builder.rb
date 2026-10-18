@@ -6,6 +6,9 @@ require 'shellwords'
 
 module SpinelAccel
   class Builder
+    CRUBY_64BIT = RUBY_ENGINE == 'ruby' && [0].pack('J').bytesize == 8
+    private_constant :CRUBY_64BIT
+
     def initialize(kernel, spinel_root: ENV['SPINEL_ROOT'])
       @kernel = kernel
       @spinel_root = spinel_root && File.expand_path(spinel_root)
@@ -13,21 +16,27 @@ module SpinelAccel
 
     def self.doctor(spinel_root: ENV['SPINEL_ROOT'])
       compiler = spinel_root && File.join(File.expand_path(spinel_root), 'bin/spinel')
-      checks = { 'cruby_64bit' => RUBY_ENGINE == 'ruby' && [0].pack('J').bytesize == 8,
+      checks = { 'cruby_64bit' => CRUBY_64BIT,
                  'ruby_headers' => File.file?(File.join(RbConfig::CONFIG.fetch('rubyhdrdir'), 'ruby.h')),
                  'runtime_sources' => !!(spinel_root && File.file?(File.join(spinel_root, 'lib/sp_gc.c'))) }
-      compiler_result = compiler && File.executable?(compiler) && Command.run([compiler, '--version'], timeout: 10)
-      checks['compiler_pin'] = !!(compiler_result && compiler_result['exit'] == 0 && !compiler_result['timeout'] && compiler_result['output'].include?(PIN))
-      %w[CC MAKE].each do |name|
-        command = name == 'CC' ? RbConfig::CONFIG.fetch('CC') : ENV.fetch('MAKE', 'make')
-        begin
-          checks[name.downcase] = Command.run(Shellwords.split(command) + ['--version'], timeout: 10)['exit'] == 0
-        rescue Errno::ENOENT
-          checks[name.downcase] = false
-        end
-      end
+      checks['compiler_pin'] = compiler_pinned?(compiler)
+      checks['cc'] = tool_available?(RbConfig::CONFIG.fetch('CC'))
+      checks['make'] = tool_available?(ENV.fetch('MAKE', 'make'))
       { 'ok' => checks.values.all? { |v| v == true }, 'checks' => checks, 'abi' => SpinelAccel.abi, 'spinel_pin' => PIN }
     end
+
+    def self.compiler_pinned?(compiler)
+      return false unless compiler && File.executable?(compiler)
+      result = Command.run([compiler, '--version'], timeout: 10)
+      result['exit'] == 0 && !result['timeout'] && result['output'].include?(PIN)
+    end
+
+    def self.tool_available?(command)
+      Command.run(Shellwords.split(command) + ['--version'], timeout: 10)['exit'] == 0
+    rescue Errno::ENOENT
+      false
+    end
+    private_class_method :compiler_pinned?, :tool_available?
 
     def emit
       report = self.class.doctor(spinel_root: @spinel_root)
@@ -81,7 +90,7 @@ module SpinelAccel
     end
 
     def compile(bundle:)
-      raise BuildError, 'native builds require 64-bit CRuby' unless RUBY_ENGINE == 'ruby' && [0].pack('J').bytesize == 8
+      raise BuildError, 'native builds require 64-bit CRuby' unless CRUBY_64BIT
       bundle = File.expand_path(bundle)
       metadata = JSON.parse(File.read(File.join(bundle, 'source.json')))
       unless metadata.fetch('format') == 1 && metadata.fetch('fingerprint') == @kernel.fingerprint && metadata.fetch('spinel_pin') == PIN

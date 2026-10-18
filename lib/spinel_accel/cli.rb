@@ -36,30 +36,16 @@ module SpinelAccel
       end
       raise ConfigurationError, 'too many positional arguments' if args.length > 1
       root = options.fetch(:spinel_root, ENV['SPINEL_ROOT'])
-      if command == 'init'
-        init(args.fetch(0) { raise ConfigurationError, 'init requires a new directory' })
-      elsif command == 'doctor'
-        result = Builder.doctor(spinel_root: root)
-        puts JSON.pretty_generate(result)
-        return result['ok'] ? 0 : 1
+      case command
+      when 'init' then init(args.fetch(0) { raise ConfigurationError, 'init requires a new directory' })
+      when 'doctor' then return doctor(root)
       else
         load File.expand_path(options[:config])
-        kernels = SpinelAccel.kernels
-        selected = args.empty? ? kernels.values : [kernels.fetch(args[0]) { raise ConfigurationError, "unknown kernel: #{args[0]}" }]
-        raise ConfigurationError, 'no kernels registered' if selected.empty?
-        results = selected.map do |kernel|
-          builder = Builder.new(kernel, spinel_root: root)
-          case command
-          when 'build' then { 'kernel' => kernel.name, 'artifact' => builder.build }
-          when 'emit' then { 'kernel' => kernel.name, 'bundle' => builder.emit }
-          when 'compile'
-            raise ConfigurationError, 'compile needs --bundle DIR and one kernel name' unless options[:bundle] && selected.length == 1
-            { 'kernel' => kernel.name, 'artifact' => builder.compile(bundle: options[:bundle]) }
-          when 'check' then { 'kernel' => kernel.name, 'verified_cases' => kernel.check! }
-          when 'bench' then Benchmark.new(kernel).run(**options.slice(:warmup, :rounds, :target_ms))
-          end
+        selected = select_kernels(args[0])
+        if command == 'compile' && !(options[:bundle] && selected.length == 1)
+          raise ConfigurationError, 'compile needs --bundle DIR and one kernel name'
         end
-        puts JSON.pretty_generate(results)
+        puts JSON.pretty_generate(selected.map { |kernel| run_kernel_command(command, kernel, root, options) })
       end
       0
     rescue Error, OptionParser::ParseError, Errno::ENOENT, KeyError => e
@@ -68,6 +54,30 @@ module SpinelAccel
     end
 
     private
+
+    def doctor(root)
+      result = Builder.doctor(spinel_root: root)
+      puts JSON.pretty_generate(result)
+      result['ok'] ? 0 : 1
+    end
+
+    def select_kernels(name)
+      kernels = SpinelAccel.kernels
+      selected = name ? [kernels.fetch(name) { raise ConfigurationError, "unknown kernel: #{name}" }] : kernels.values
+      raise ConfigurationError, 'no kernels registered' if selected.empty?
+      selected
+    end
+
+    def run_kernel_command(command, kernel, root, options)
+      builder = Builder.new(kernel, spinel_root: root)
+      case command
+      when 'build' then { 'kernel' => kernel.name, 'artifact' => builder.build }
+      when 'emit' then { 'kernel' => kernel.name, 'bundle' => builder.emit }
+      when 'compile' then { 'kernel' => kernel.name, 'artifact' => builder.compile(bundle: options[:bundle]) }
+      when 'check' then { 'kernel' => kernel.name, 'verified_cases' => kernel.check! }
+      when 'bench' then Benchmark.new(kernel).run(**options.slice(:warmup, :rounds, :target_ms))
+      end
+    end
 
     def init(dir)
       raise ConfigurationError, "directory already exists: #{dir}" if File.exist?(dir)
