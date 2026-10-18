@@ -19,18 +19,24 @@ module SpinelAccel
       checks = { 'cruby_64bit' => CRUBY_64BIT,
                  'ruby_headers' => File.file?(File.join(RbConfig::CONFIG.fetch('rubyhdrdir'), 'ruby.h')),
                  'runtime_sources' => !!(spinel_root && File.file?(File.join(spinel_root, 'lib/sp_gc.c'))) }
-      compiler_result = compiler && File.executable?(compiler) && Command.run([compiler, '--version'], timeout: 10)
-      checks['compiler_pin'] = !!(compiler_result && compiler_result['exit'] == 0 && !compiler_result['timeout'] && compiler_result['output'].include?(PIN))
-      %w[CC MAKE].each do |name|
-        command = name == 'CC' ? RbConfig::CONFIG.fetch('CC') : ENV.fetch('MAKE', 'make')
-        begin
-          checks[name.downcase] = Command.run(Shellwords.split(command) + ['--version'], timeout: 10)['exit'] == 0
-        rescue Errno::ENOENT
-          checks[name.downcase] = false
-        end
-      end
+      checks['compiler_pin'] = compiler_pinned?(compiler)
+      checks['cc'] = tool_available?(RbConfig::CONFIG.fetch('CC'))
+      checks['make'] = tool_available?(ENV.fetch('MAKE', 'make'))
       { 'ok' => checks.values.all? { |v| v == true }, 'checks' => checks, 'abi' => SpinelAccel.abi, 'spinel_pin' => PIN }
     end
+
+    def self.compiler_pinned?(compiler)
+      return false unless compiler && File.executable?(compiler)
+      result = Command.run([compiler, '--version'], timeout: 10)
+      result['exit'] == 0 && !result['timeout'] && result['output'].include?(PIN)
+    end
+
+    def self.tool_available?(command)
+      Command.run(Shellwords.split(command) + ['--version'], timeout: 10)['exit'] == 0
+    rescue Errno::ENOENT
+      false
+    end
+    private_class_method :compiler_pinned?, :tool_available?
 
     def emit
       report = self.class.doctor(spinel_root: @spinel_root)
