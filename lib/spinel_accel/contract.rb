@@ -2,29 +2,42 @@
 
 module SpinelAccel
   module Contract
-    TYPES = %w[integer float boolean string integer_array float_array string_array].freeze
     # The pinned CRuby shim accepts FIXNUMs, including inside integer arrays.
     INTEGER_RANGE = (-(1 << 62)..((1 << 62) - 1)).freeze
+    STRING_ENCODINGS = [Encoding::UTF_8, Encoding::US_ASCII].freeze
+
+    string = lambda do |value|
+      value.instance_of?(String) && STRING_ENCODINGS.include?(value.encoding) && value.valid_encoding? && !value.include?("\0")
+    end
+    # Array checks run once per call on the hot path, so they lean on C-level
+    # iteration instead of a Ruby block per element.
+    VALIDATORS = {
+      'integer' => ->(value) { value.is_a?(Integer) && INTEGER_RANGE.cover?(value) },
+      'float' => ->(value) { value.is_a?(Float) && value.finite? },
+      'boolean' => ->(value) { value.equal?(true) || value.equal?(false) },
+      'string' => string,
+      'integer_array' => lambda do |value|
+        value.instance_of?(Array) && value.all?(Integer) &&
+          (value.empty? || (INTEGER_RANGE.cover?(value.min) && INTEGER_RANGE.cover?(value.max)))
+      end,
+      # A non-finite element always makes the sum non-finite; only a finite
+      # overflow needs the per-element fallback.
+      'float_array' => ->(value) { value.instance_of?(Array) && value.all?(Float) && (value.sum.finite? || value.all?(&:finite?)) },
+      'string_array' => ->(value) { value.instance_of?(Array) && value.all?(&string) }
+    }.freeze
+    TYPES = VALIDATORS.keys.freeze
 
     def self.validate_type!(type)
       raise ConfigurationError, "unsupported boundary type: #{type}" unless TYPES.include?(type.to_s)
       type.to_s.dup.freeze
     end
 
+    def self.valid?(type, value)
+      VALIDATORS.fetch(type.to_s).call(value)
+    end
+
     def self.validate!(type, value, label)
-      type = type.to_s
-      valid = case type
-              when 'integer' then value.is_a?(Integer) && INTEGER_RANGE.cover?(value)
-              when 'float' then value.is_a?(Float) && value.finite?
-              when 'boolean' then value.equal?(true) || value.equal?(false)
-              when 'string'
-                value.instance_of?(String) && [Encoding::UTF_8, Encoding::US_ASCII].include?(value.encoding) && value.valid_encoding? && !value.include?("\0")
-              else
-                type.end_with?('_array') && value.instance_of?(Array) && value.all? do |item|
-                  validate!(type.delete_suffix('_array'), item, label)
-                end
-              end
-      raise ContractError, "#{label} must be #{type}" unless valid
+      raise ContractError, "#{label} must be #{type}" unless valid?(type, value)
       true
     end
 

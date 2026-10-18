@@ -4,9 +4,12 @@ require 'thread'
 
 module SpinelAccel
   class Kernel
-    attr_reader :name, :source, :source_text, :module_name, :entries, :samples, :cache_dir, :fingerprint
+    MODES = %w[ruby native verify].freeze
 
-    def initialize(name:, source:, module_name:, entries:, samples: {}, cache_dir: ENV.fetch('SPINEL_ACCEL_CACHE', '.spinel_accel'))
+    attr_reader :name, :source, :source_text, :module_name, :entries, :samples, :bench_inputs, :cache_dir, :fingerprint, :mode
+
+    def initialize(name:, source:, module_name:, entries:, samples: {}, bench_inputs: {},
+                   cache_dir: ENV.fetch('SPINEL_ACCEL_CACHE', '.spinel_accel'), mode: ENV.fetch('SPINEL_ACCEL_MODE', 'ruby'))
       @name = name.to_s.dup.freeze
       @module_name = module_name.to_s.dup.freeze
       unless @name.match?(/\A[a-zA-Z][a-zA-Z0-9_-]*\z/) && @module_name.match?(/\A[A-Z]\w*(?:::[A-Z]\w*)*\z/)
@@ -25,6 +28,20 @@ module SpinelAccel
       @samples = samples.to_h.to_h do |key, cases|
         [key.to_s.dup.freeze, cases.map { |args| Contract.frozen_copy(args) }.freeze]
       end.freeze
+      @bench_inputs = bench_inputs.to_h.to_h do |key, cases|
+        entry = key.to_s.dup.freeze
+        spec = @entries.fetch(entry) { raise ConfigurationError, "bench_inputs for unknown entry: #{entry}" }
+        cases.each do |args|
+          unless args.length == spec['params'].length && spec['params'].zip(args).all? { |type, value| Contract.valid?(type, value) }
+            raise ConfigurationError, "bench_inputs for #{entry} do not match its params"
+          end
+        end
+        [entry, cases.map { |args| Contract.frozen_copy(args) }.freeze]
+      end.freeze
+      @mode = mode.to_s.dup.freeze
+      raise ConfigurationError, "unknown mode: #{@mode}" unless MODES.include?(@mode)
+      # Symbol and String keys both resolve without allocating on each call.
+      @lookup = with_symbol_keys(@entries.to_h { |key, spec| [key, [key, spec].freeze] })
       @cache_dir = File.expand_path(cache_dir).freeze
       @fingerprint = Digest::SHA256.hexdigest(JSON.generate({ 'gem' => VERSION, 'pin' => PIN,
         'name' => @name, 'source' => Digest::SHA256.hexdigest(@source_text), 'module' => @module_name, 'entries' => @entries })).freeze
@@ -44,14 +61,7 @@ module SpinelAccel
     end
 
     def ruby_method(entry)
-      @mutex.synchronize do
-        unless @ruby_module
-          scope = Module.new
-          scope.module_eval(source_text, source, 1)
-          @ruby_module = module_name.split('::').reduce(scope) { |mod, key| mod.const_get(key, false) }
-        end
-        @ruby_module.method(entry.to_s)
-      end
+      resolve(@ruby_methods || load_ruby_methods, entry)
     end
 
     def artifact
@@ -73,30 +83,22 @@ module SpinelAccel
     end
 
     def native_method(entry)
-      @mutex.synchronize do
-        unless @native_module
-          library, = artifact
-          require library
-          @native_module = Object.const_get(native_constant, false)
-          entries.each_key do |key|
-            raise ArtifactError, "#{key} is not a native method" if @native_module.method(key).source_location
-          end
-        end
-        @native_module.method(entry.to_s)
-      end
-    rescue LoadError, NameError => e
-      raise ArtifactError, "#{name}: failed to load native extension: #{e.message}"
+      resolve(@native_methods || load_native_methods, entry)
     end
 
-    def call(entry, *args, mode: ENV.fetch('SPINEL_ACCEL_MODE', 'ruby'))
-      key = entry.to_s
-      spec = entries.fetch(key) { raise ConfigurationError, "unknown entry: #{key}" }
-      raise ContractError, "#{key} expects #{spec['params'].length} arguments" unless args.length == spec['params'].length
-      spec['params'].zip(args).each_with_index { |(type, value), i| Contract.validate!(type, value, "#{key} argument #{i}") }
-      case mode.to_s
-      when 'ruby' then invoke(ruby_method(key), spec, args)
-      when 'native' then invoke(native_method(key), spec, args)
-      when 'verify' then verify(key, spec, args)
+    def call(entry, *args, mode: @mode)
+      key, spec = @lookup[entry] || raise(ConfigurationError, "unknown entry: #{entry}")
+      params = spec['params']
+      raise ContractError, "#{key} expects #{params.length} arguments" unless args.length == params.length
+      i = 0
+      while i < params.length
+        raise ContractError, "#{key} argument #{i} must be #{params[i]}" unless Contract.valid?(params[i], args[i])
+        i += 1
+      end
+      case mode
+      when 'ruby', :ruby then invoke(ruby_method(key), spec, args)
+      when 'native', :native then invoke(native_method(key), spec, args)
+      when 'verify', :verify then verify(key, spec, args)
       else raise ConfigurationError, "unknown mode: #{mode}"
       end
     end
@@ -112,6 +114,44 @@ module SpinelAccel
     end
 
     private
+
+    def with_symbol_keys(hash)
+      hash.merge(hash.transform_keys(&:to_sym)).freeze
+    end
+
+    def resolve(methods, entry)
+      methods.fetch(entry) { raise ConfigurationError, "unknown entry: #{entry}" }
+    end
+
+    # Method tables are built once and published frozen, so calls read them
+    # without taking the lock.
+    def load_ruby_methods
+      @mutex.synchronize do
+        @ruby_methods ||= begin
+          scope = Module.new
+          scope.module_eval(source_text, source, 1)
+          mod = module_name.split('::').reduce(scope) { |parent, key| parent.const_get(key, false) }
+          with_symbol_keys(entries.keys.to_h { |key| [key, mod.method(key)] })
+        end
+      end
+    end
+
+    def load_native_methods
+      @mutex.synchronize do
+        @native_methods ||= begin
+          library, = artifact
+          require library
+          mod = Object.const_get(native_constant, false)
+          methods = entries.keys.to_h { |key| [key, mod.method(key)] }
+          methods.each do |key, method|
+            raise ArtifactError, "#{key} is not a native method" if method.source_location
+          end
+          with_symbol_keys(methods)
+        end
+      end
+    rescue LoadError, NameError => e
+      raise ArtifactError, "#{name}: failed to load native extension: #{e.message}"
+    end
 
     def invoke(method, spec, args)
       value = method.call(*args)

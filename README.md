@@ -63,7 +63,7 @@ SUM.call(:sum, [1, 2, 3], mode: :native)  # Execute the prebuilt extension
 SUM.call(:sum, [1, 2, 3], mode: :verify)  # Execute both and compare
 ```
 
-The default is `ruby`. Set `SPINEL_ACCEL_MODE=ruby|native|verify` to change it. Native and verify modes fail on missing artifacts, ABI mismatches, or checksum mismatches. They never silently fall back. Ruby code is evaluated in an anonymous scope, and each extension has a distinct module, so loading an extension does not replace the reference methods.
+The default is `ruby`. Set `SPINEL_ACCEL_MODE=ruby|native|verify` or pass `mode:` to `register` to change it. The default is read once when the kernel is registered, and an unknown value fails registration. Native and verify modes fail on missing artifacts, ABI mismatches, or checksum mismatches. They never silently fall back. Ruby code is evaluated in an anonymous scope, and each extension has a distinct module, so loading an extension does not replace the reference methods.
 
 Tested with real native extensions on Linux arm64 / Ruby 3.3.6 and macOS arm64 / Ruby 4.0.2. See [VALIDATION.md](VALIDATION.md) for results and limitations.
 
@@ -118,7 +118,7 @@ export SPINEL_ROOT="$PWD/tmp/spinel-src"
 
 ## Benchmarking and ISUCON preparation
 
-`bench` first verifies every sample. Timings include argument validation, Ruby/native conversion, computation, and return validation. Defaults are 50 warmup calls and seven alternating Ruby/native rounds. JSON contains all timing samples and medians. Each mode processes the same fixture proportions.
+`bench` first verifies every sample. Correctness samples are often tiny edge cases, so register representative timing inputs separately with `bench_inputs: { entry: [args, ...] }`. They must match the entry's params, are verified before timing, and replace that entry's samples as the workload; each JSON row reports its `workload`. Timings include argument validation, Ruby/native conversion, computation, and return validation. Defaults are 50 warmup calls and seven alternating Ruby/native rounds. JSON contains all timing samples and medians. Each mode processes the same fixture proportions.
 
 ```sh
 RUBYOPT=--yjit spinel-accel bench sum --rounds 7 --warmup 50 --target-ms 30
