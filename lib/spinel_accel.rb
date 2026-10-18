@@ -39,6 +39,7 @@ end
 
 require_relative 'spinel_accel/contract'
 require_relative 'spinel_accel/kernel'
+require_relative 'spinel_accel/artifact_store'
 require_relative 'spinel_accel/command'
 require_relative 'spinel_accel/builder'
 require_relative 'spinel_accel/benchmark'
