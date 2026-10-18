@@ -2,7 +2,7 @@
 
 Accelerate CPU-heavy parts of a Ruby application by compiling them into CRuby extensions with [Spinel](https://github.com/matz/spinel), while the rest of the application stays in Ruby. You register a pure function, build it explicitly, verify it against the Ruby implementation, and measure the speedup including data conversion.
 
-- Spinel is pinned to `72e45de6e5411b98e8efbdf468e6660495026dc5`.
+- Spinel is pinned to `e1d92f1e1923664db9deb5b9e1dc5e3b309d2cfb`.
 - Native execution requires 64-bit CRuby.
 - Spinel compiles small, self-contained computations, not arbitrary Ruby applications.
 - Tested on Linux arm64 / Ruby 3.3.6 and macOS arm64 / Ruby 4.0.2. See [VALIDATION.md](VALIDATION.md).
@@ -150,9 +150,9 @@ Checksums detect changed files but are not signatures. Load sources, registratio
 
 ```sh
 mkdir -p tmp/spinel-src
-curl -fL https://api.github.com/repos/matz/spinel/tarball/72e45de6e5411b98e8efbdf468e6660495026dc5 -o tmp/spinel.tar.gz
+curl -fL https://api.github.com/repos/matz/spinel/tarball/e1d92f1e1923664db9deb5b9e1dc5e3b309d2cfb -o tmp/spinel.tar.gz
 tar -xzf tmp/spinel.tar.gz -C tmp/spinel-src --strip-components=1
-ruby -e 'File.write("tmp/spinel-src/.spinel-dist", "72e45de6e5411b98e8efbdf468e6660495026dc5\nunreleased\n")'
+ruby -e 'File.write("tmp/spinel-src/.spinel-dist", "e1d92f1e1923664db9deb5b9e1dc5e3b309d2cfb\nunreleased\n")'
 GIT_CEILING_DIRECTORIES="$PWD/tmp" make -C tmp/spinel-src deps
 GIT_CEILING_DIRECTORIES="$PWD/tmp" make -C tmp/spinel-src -j8
 export SPINEL_ROOT="$PWD/tmp/spinel-src"

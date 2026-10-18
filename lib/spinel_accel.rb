@@ -6,7 +6,7 @@ require 'rbconfig'
 require_relative 'spinel_accel/version'
 
 module SpinelAccel
-  PIN = '72e45de6e5411b98e8efbdf468e6660495026dc5'
+  PIN = 'e1d92f1e1923664db9deb5b9e1dc5e3b309d2cfb'
   class Error < StandardError; end
   class ConfigurationError < Error; end
   class ContractError < Error; end
