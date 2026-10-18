@@ -173,14 +173,18 @@ module SpinelAccel
       expected = outcome(ruby_method(key), spec, copies[0])
       actual = outcome(native_method(key), spec, copies[1])
       raise MutationError, "#{name}.#{key} mutated its inputs" unless copies.all? { |copy| Contract.equal?(copy, args) }
-      same = expected[0] == actual[0] && if expected[0] == :error
-        expected[1].class == actual[1].class && expected[1].message == actual[1].message
-      else
-        Contract.equal?(expected[1], actual[1])
-      end
-      raise Mismatch, "#{name}.#{key}: Ruby and native results differ" unless same
-      raise expected[1] if expected[0] == :error
+      raise Mismatch, "#{name}.#{key}: Ruby and native results differ" unless same_outcome?(expected, actual)
+      kind, payload = expected
+      raise payload if kind == :error
       actual[1]
+    end
+
+    def same_outcome?(expected, actual)
+      expected_kind, expected_payload = expected
+      actual_kind, actual_payload = actual
+      return false unless expected_kind == actual_kind
+      return Contract.equal?(expected_payload, actual_payload) unless expected_kind == :error
+      expected_payload.class == actual_payload.class && expected_payload.message == actual_payload.message
     end
   end
 end
