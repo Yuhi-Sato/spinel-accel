@@ -12,6 +12,7 @@ module SpinelAccel
     def initialize(kernel, spinel_root: ENV['SPINEL_ROOT'])
       @kernel = kernel
       @spinel_root = spinel_root && File.expand_path(spinel_root)
+      @store = ArtifactStore.new(kernel)
     end
 
     def self.doctor(spinel_root: ENV['SPINEL_ROOT'])
@@ -69,18 +70,7 @@ module SpinelAccel
           %w[*.c *.h regexp/*.c regexp/*.h regexp/*.inc regexp/shim/*.h].flat_map { |pattern| Dir[File.join(runtime, pattern)] }.each { |path| FileUtils.cp(path, stage) }
           FileUtils.cp_r(File.join(runtime, 'regexp/shim/mruby'), stage)
           FileUtils.cp(File.join(@spinel_root, 'LICENSE'), File.join(stage, 'SPINEL_LICENSE'))
-          files = Dir[File.join(stage, '**/*')].select { |p| File.file?(p) }.sort.to_h do |path|
-            [path.delete_prefix(stage + '/'), Digest::SHA256.file(path).hexdigest]
-          end
-          metadata = { 'format' => 1, 'fingerprint' => @kernel.fingerprint, 'spinel_pin' => PIN,
-                       'compiler_sha256' => Digest::SHA256.file(compiler).hexdigest, 'compiler_version' => version,
-                       'files' => files }
-          File.write(File.join(stage, 'source.json'), JSON.pretty_generate(metadata) + "\n")
-          key = Digest::SHA256.file(File.join(stage, 'source.json')).hexdigest
-          destination = File.join(@kernel.root, 'bundles', key)
-          FileUtils.mkdir_p(File.dirname(destination))
-          FileUtils.cp_r(stage, destination) unless File.exist?(destination)
-          destination
+          @store.publish_bundle(stage, compiler_sha256: Digest::SHA256.file(compiler).hexdigest, compiler_version: version)
         end
       end
     end
@@ -92,47 +82,16 @@ module SpinelAccel
     def compile(bundle:)
       raise BuildError, 'native builds require 64-bit CRuby' unless CRUBY_64BIT
       bundle = File.expand_path(bundle)
-      metadata = JSON.parse(File.read(File.join(bundle, 'source.json')))
-      unless metadata.fetch('format') == 1 && metadata.fetch('fingerprint') == @kernel.fingerprint && metadata.fetch('spinel_pin') == PIN
-        raise ArtifactError, 'source bundle belongs to a different kernel or compiler pin'
-      end
-      files = metadata.fetch('files')
-      required = ["#{@kernel.feature}.c", "#{@kernel.feature}_ext.c", "#{@kernel.feature}.h", 'sp_gc.c', 'spinel_rt.h', 'SPINEL_LICENSE']
-      raise ArtifactError, 'source bundle is incomplete' unless (required - files.keys).empty?
-      files.each do |path, hash|
-        unless path.match?(/\A[\w.\/-]+\z/) && !path.split('/').include?('..') && !path.start_with?('/') &&
-               File.file?(File.join(bundle, path)) && !File.symlink?(File.join(bundle, path)) && Digest::SHA256.file(File.join(bundle, path)).hexdigest == hash
-          raise ArtifactError, "source bundle checksum/path mismatch: #{path}"
-        end
-      end
       with_lock do
         Dir.mktmpdir('compile-', @kernel.root) do |stage|
-          files.each_key do |path|
-            target = File.join(stage, path)
-            FileUtils.mkdir_p(File.dirname(target))
-            FileUtils.cp(File.join(bundle, path), target)
-          end
+          metadata = @store.extract_bundle(bundle, into: stage)
           File.write(File.join(stage, 'exports.map'), "{ global: Init_#{@kernel.feature}; local: *; };\n")
           File.write(File.join(stage, 'extconf.rb'), extconf)
           started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           Command.run!([RbConfig.ruby, 'extconf.rb'], dir: stage, log: log)
           Command.run!(Shellwords.split(ENV.fetch('MAKE', 'make')) + ['-j8'], dir: stage, log: log)
-          extension = "#{@kernel.feature}.#{RbConfig::CONFIG.fetch('DLEXT')}"
-          sha = Digest::SHA256.file(File.join(stage, extension)).hexdigest
-          target = File.join(@kernel.root, 'native', SpinelAccel.abi_key, sha)
-          FileUtils.mkdir_p(target)
-          FileUtils.cp(File.join(stage, extension), File.join(target, extension)) unless File.exist?(File.join(target, extension))
-          FileUtils.cp(File.join(stage, 'SPINEL_LICENSE'), target)
-          build = metadata.reject { |key, _| key == 'files' }.merge('abi' => SpinelAccel.abi,
-            'extension_sha256' => sha, 'gem_version' => VERSION, 'ruby' => RUBY_DESCRIPTION,
-            'source_bundle_sha256' => Digest::SHA256.file(File.join(bundle, 'source.json')).hexdigest,
-            'build_seconds' => (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(3))
-          File.write(File.join(target, 'build.json'), JSON.pretty_generate(build) + "\n")
-          pointer = File.join(File.dirname(target), 'current.json')
-          temporary = "#{pointer}.#{Process.pid}.tmp"
-          File.write(temporary, JSON.generate('artifact' => sha) + "\n")
-          File.rename(temporary, pointer)
-          target
+          @store.install(stage, bundle: bundle, metadata: metadata,
+                         build_seconds: (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(3))
         end
       end
     rescue JSON::ParserError, KeyError, Errno::ENOENT => e

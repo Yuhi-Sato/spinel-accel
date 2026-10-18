@@ -46,21 +46,7 @@ module SpinelAccel
     end
 
     def artifact
-      base = File.join(root, 'native', SpinelAccel.abi_key)
-      pointer = JSON.parse(File.read(File.join(base, 'current.json')))
-      id = pointer.fetch('artifact')
-      raise ArtifactError, 'invalid artifact identifier' unless id.match?(/\A[0-9a-f]{64}\z/)
-      dir = File.join(base, id)
-      metadata = JSON.parse(File.read(File.join(dir, 'build.json')))
-      unless metadata.fetch('fingerprint') == fingerprint && metadata.fetch('abi') == SpinelAccel.abi && metadata.fetch('spinel_pin') == PIN
-        raise ArtifactError, "stale kernel or Ruby ABI mismatch: #{name}; rebuild"
-      end
-      library = File.join(dir, "#{feature}.#{RbConfig::CONFIG.fetch('DLEXT')}")
-      actual = Digest::SHA256.file(library).hexdigest
-      raise ArtifactError, 'extension checksum mismatch' unless actual == id && actual == metadata.fetch('extension_sha256')
-      [library, metadata]
-    rescue Errno::ENOENT, JSON::ParserError, KeyError => e
-      raise ArtifactError, "#{name}: native artifact unavailable; run spinel-accel build (#{e.message})"
+      ArtifactStore.new(self).current_library
     end
 
     def native_method(entry)
