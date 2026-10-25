@@ -1,0 +1,1458 @@
+[
+  {
+    "kernel": "ackermann",
+    "fingerprint": "dd6604126e0450f22bcdff7f5756cdf7e2074a364f947eeb46e65f5032e34773",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "ack",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            29905.727276028218,
+            29867.272728800097,
+            29956.63636829704,
+            30015.18181885,
+            29894.90908591754,
+            30007.181821433318,
+            29898.81818013435
+          ],
+          "native": [
+            26884.166664482716,
+            26870.416666497476,
+            26930.50000137494,
+            26873.416665087763,
+            26848.250000815216,
+            27635.083334947314,
+            26860.000002974022
+          ]
+        },
+        "median_us": {
+          "ruby": 29905.727276028218,
+          "native": 26873.416665087763
+        },
+        "speedup": 1.112836810024229,
+        "iterations": {
+          "ruby": 11,
+          "native": 12
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "ao_render",
+    "fingerprint": "b74c561a6c77e7f8d16b5a8eaef12aae4f5d6054b54b08a425f655c272d31633",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "render",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            465066.000004299,
+            464490.00004213303,
+            477666.9999700971,
+            457133.99996748194,
+            453112.0000174269,
+            464399.00004770607,
+            480656.99997823685
+          ],
+          "native": [
+            47153.28571286851,
+            47296.85714534883,
+            48647.57142162749,
+            47148.71428274949,
+            47068.999997074054,
+            47671.14285745525,
+            47157.4285682956
+          ]
+        },
+        "median_us": {
+          "ruby": 464490.00004213303,
+          "native": 47157.4285682956
+        },
+        "speedup": 9.849773707856796,
+        "iterations": {
+          "ruby": 1,
+          "native": 7
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "bigint_fib",
+    "fingerprint": "7d356e3e3bcbbf64c10f846cb75d23faf3a13b1e15adbf6e8a3e2017aae6caaf",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            33.80231976956271,
+            33.84091590700933,
+            33.724127587045714,
+            34.193680633556774,
+            34.29567043127267,
+            33.81971802835139,
+            34.003799619215904
+          ],
+          "native": [
+            31.91817348587657,
+            31.531789015035535,
+            31.23723023101028,
+            35.799183401164065,
+            30.913590533885,
+            31.0032497277784,
+            30.863511370805842
+          ]
+        },
+        "median_us": {
+          "ruby": 33.84091590700933,
+          "native": 31.23723023101028
+        },
+        "speedup": 1.0833520019778926,
+        "iterations": {
+          "ruby": 10001,
+          "native": 12001
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "binary_trees",
+    "fingerprint": "21ad0f3416c1550e33ffb3b7f4020a6d22f8ac60592d6631a450cb3bc1d97df4",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            3340.212121427134,
+            3332.4444443081516,
+            3329.8383838487694,
+            3438.999999850763,
+            3308.161616330082,
+            3325.727273183263,
+            3303.9595964693963
+          ],
+          "native": [
+            1582.155279635874,
+            1598.5217391547997,
+            1598.2111803146067,
+            1710.7329193953865,
+            1474.080745041116,
+            1583.8757766156186,
+            1571.6335406492215
+          ]
+        },
+        "median_us": {
+          "ruby": 3329.8383838487694,
+          "native": 1583.8757766156186
+        },
+        "speedup": 2.1023355701315634,
+        "iterations": {
+          "ruby": 99,
+          "native": 161
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "csv_process",
+    "fingerprint": "eaf8efb41e14e4c22478481ef8a14470cc06aab088255603be185cc6b47c58ce",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            236870.49999716692,
+            237313.49999434315,
+            236401.50000574067,
+            236480.4999961052,
+            234793.99998905137,
+            236666.99999012053,
+            235301.4999825973
+          ],
+          "native": [
+            86131.49999291636,
+            90380.24999608751,
+            85576.49998692796,
+            86115.5000020517,
+            85396.4999987511,
+            86661.50001226924,
+            86394.50000191573
+          ]
+        },
+        "median_us": {
+          "ruby": 236480.4999961052,
+          "native": 86131.49999291636
+        },
+        "speedup": 2.74557508014552,
+        "iterations": {
+          "ruby": 2,
+          "native": 4
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "fannkuch",
+    "fingerprint": "cef71d72f26ec438e64242015cbf68c85a8b6c194b6abba1887c526358e27067",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "fannkuch",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            1184.461352635841,
+            678.2270531824695,
+            667.7415458134551,
+            676.2004830280616,
+            693.4444445066136,
+            680.999999926628,
+            666.1521738219628
+          ],
+          "native": [
+            70.05868981742285,
+            60.70551766561105,
+            60.64476131748906,
+            62.101673905774845,
+            61.43252738089595,
+            60.216367018962785,
+            60.3234139266269
+          ]
+        },
+        "median_us": {
+          "ruby": 678.2270531824695,
+          "native": 60.70551766561105
+        },
+        "speedup": 11.172411985981253,
+        "iterations": {
+          "ruby": 414,
+          "native": 4839
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "fasta",
+    "fingerprint": "9cdbbc30cba7adb3e94c513f2a2776cd9ac48d1c74de18fa59bf42faf58646e9",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "fasta",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            675.5403050755136,
+            659.1895424501163,
+            649.8910674636611,
+            654.5773420223159,
+            651.5098039988096,
+            659.989106848284,
+            656.60130710408
+          ],
+          "native": [
+            217.54172276504949,
+            209.5323015010037,
+            210.67362047279377,
+            201.64939431375842,
+            204.41453569239033,
+            201.51009421524859,
+            228.44885601906523
+          ]
+        },
+        "median_us": {
+          "ruby": 656.60130710408,
+          "native": 209.5323015010037
+        },
+        "speedup": 3.133651959151199,
+        "iterations": {
+          "ruby": 459,
+          "native": 1486
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "fib",
+    "fingerprint": "bee7365e359cb372f7df761c189944f92ee72f1baf1129fcd098742669f6e83a",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "fib",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            44986.428568206196,
+            45055.99999434448,
+            44988.571433350444,
+            45176.000001707245,
+            44866.28571924354,
+            44879.71428482394,
+            44999.57143395607
+          ],
+          "native": [
+            13523.260870462527,
+            13456.782609548258,
+            13480.913043325849,
+            13582.652174037597,
+            13451.086957027892,
+            13491.217391160519,
+            13493.043476837162
+          ]
+        },
+        "median_us": {
+          "ruby": 44988.571433350444,
+          "native": 13491.217391160519
+        },
+        "speedup": 3.3346561788283893,
+        "iterations": {
+          "ruby": 7,
+          "native": 23
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "gcbench",
+    "fingerprint": "7c44f3fe014ec4111b2e53cd6168b54fd22e6971dc2a385ac8472274a2cc6ef2",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            584303.00001055,
+            578294.0000062808,
+            580797.9999808595,
+            573850.9999937378,
+            564485.999988392,
+            569698.9999851212,
+            566980.000003241
+          ],
+          "native": [
+            130528.33334465201,
+            139639.99998910972,
+            128317.66666689266,
+            116732.00000465538,
+            125080.6666794233,
+            119298.33332154278,
+            120405.00001360972
+          ]
+        },
+        "median_us": {
+          "ruby": 573850.9999937378,
+          "native": 125080.6666794233
+        },
+        "speedup": 4.58784730868516,
+        "iterations": {
+          "ruby": 1,
+          "native": 3
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "huffman",
+    "fingerprint": "1d783f2692dd9272d488bf4e8d7db42b7a74a17b0a1673ba68150357b7ba9b27",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "huffman",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            9688.406249551917,
+            9920.687500198255,
+            10057.187499114661,
+            9752.937499797554,
+            9744.468750795932,
+            10109.000000738888,
+            9760.500000993488
+          ],
+          "native": [
+            2932.252426794504,
+            2927.6893202902625,
+            3030.6504849452995,
+            3024.7184467158345,
+            2937.52427203852,
+            3399.8349511959746,
+            2945.126213463367
+          ]
+        },
+        "median_us": {
+          "ruby": 9760.500000993488,
+          "native": 2945.126213463367
+        },
+        "speedup": 3.3141194276748758,
+        "iterations": {
+          "ruby": 32,
+          "native": 103
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "io_wordcount",
+    "fingerprint": "1be01061b1c6bbc826fb25ea75def682d3966990defd92453d7f67aa74335e7e",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            21076.86666616549,
+            20657.20000149061,
+            20509.199999893706,
+            20853.33333428328,
+            20671.933334476005,
+            20591.199999519933,
+            20796.80000121395
+          ],
+          "native": [
+            8416.783783547076,
+            8314.189189617095,
+            8393.432432156358,
+            8509.486485776064,
+            8604.000000018828,
+            8464.972973121581,
+            8645.432433302238
+          ]
+        },
+        "median_us": {
+          "ruby": 20671.933334476005,
+          "native": 8464.972973121581
+        },
+        "speedup": 2.4420554442541746,
+        "iterations": {
+          "ruby": 15,
+          "native": 37
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "json_parse",
+    "fingerprint": "ea5187ec42a9c01fcfe33497bd1eb82a917c2420ce0d9b58f526a620e7a5bfa4",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            85052.75000061374,
+            83513.24999239296,
+            83214.50000221375,
+            84299.49999845121,
+            84027.7499955846,
+            83470.50000156742,
+            85619.50000876095
+          ],
+          "native": [
+            20058.066669541102,
+            20978.266668195527,
+            19952.866664001096,
+            19972.33333531767,
+            20011.066664786387,
+            20015.333332897473,
+            20061.133336275816
+          ]
+        },
+        "median_us": {
+          "ruby": 84027.7499955846,
+          "native": 20015.333332897473
+        },
+        "speedup": 4.198168903711209,
+        "iterations": {
+          "ruby": 4,
+          "native": 15
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "life",
+    "fingerprint": "d91780187b17ae75f558bb969980e8c8e5eb8cb3a9bf44641c6075b4789ca64b",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            180355.49999331124,
+            179041.0000248812,
+            173975.49998713657,
+            175714.49998649769,
+            174450.9999989532,
+            177342.50001376495,
+            174073.50000576116
+          ],
+          "native": [
+            15391.833333220953,
+            15682.333333340162,
+            15789.722221800022,
+            15698.888888841288,
+            15538.111109183066,
+            15199.055555664623,
+            15569.833333655777
+          ]
+        },
+        "median_us": {
+          "ruby": 175714.49998649769,
+          "native": 15569.833333655777
+        },
+        "speedup": 11.285573597417574,
+        "iterations": {
+          "ruby": 2,
+          "native": 18
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "linked_list",
+    "fingerprint": "4cec57cc33c19e7bd73bcea63d83e59c36e0d0bfa38cb82d9b66f64c229cb78a",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "linked_list",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            67688.3333362639,
+            62628.33333069769,
+            65377.33333728587,
+            61033.16666364359,
+            64531.833331178255,
+            59529.16666865349,
+            63614.66666567139
+          ],
+          "native": [
+            15699.210527696108,
+            15512.263157257908,
+            15450.473684866569,
+            15576.526314314258,
+            15520.368420862054,
+            15885.210525563085,
+            15902.999999908436
+          ]
+        },
+        "median_us": {
+          "ruby": 63614.66666567139,
+          "native": 15576.526314314258
+        },
+        "speedup": 4.084008551201293,
+        "iterations": {
+          "ruby": 6,
+          "native": 19
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "mandel_term",
+    "fingerprint": "60c2e67a3b60f8d8b9de9d3f77cbd50798038c6f9315ca940daec187e15bbc89",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "mandel_calc",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            1116.973384037373,
+            1139.5399240482982,
+            1117.7566539878628,
+            1118.3041826903311,
+            1111.2813688655287,
+            1118.247148256834,
+            1110.4258554615787
+          ],
+          "native": [
+            511.7253333640595,
+            510.96533332020044,
+            508.85333338131505,
+            511.2960000211994,
+            510.6373333061735,
+            516.7253334075212,
+            510.5493334122002
+          ]
+        },
+        "median_us": {
+          "ruby": 1117.7566539878628,
+          "native": 510.96533332020044
+        },
+        "speedup": 2.187539116841439,
+        "iterations": {
+          "ruby": 263,
+          "native": 375
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "matmul",
+    "fingerprint": "5c42456f874dfe2f1c6da5dc0d1265ff047f6c9167c97cb01463f0a0fab0847d",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            49165.42856621423,
+            49060.14285682301,
+            48985.2857094125,
+            49161.857143709705,
+            49157.71428828261,
+            48758.28571883695,
+            55463.14285935036
+          ],
+          "native": [
+            2869.5849057084897,
+            2866.3207546210374,
+            2866.028301760484,
+            2870.9999998407616,
+            2869.103773813343,
+            2878.2075469795054,
+            2916.0849055943063
+          ]
+        },
+        "median_us": {
+          "ruby": 49157.71428828261,
+          "native": 2869.5849057084897
+        },
+        "speedup": 17.13060108118521,
+        "iterations": {
+          "ruby": 7,
+          "native": 106
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "nqueens",
+    "fingerprint": "fe3776843ad5c58cc559357eef71f1b014fe76eab6b7e88ad3dd2fb5d6e8c321",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            27356.916669911396,
+            26017.833336178835,
+            25646.333330466103,
+            25616.83333381855,
+            25619.750003291603,
+            25556.499997037463,
+            25522.66666801491
+          ],
+          "native": [
+            2538.90384584128,
+            2350.1826922606247,
+            2524.384615893583,
+            2549.3269232146513,
+            2398.826923476568,
+            2323.499999944873,
+            2294.326923080147
+          ]
+        },
+        "median_us": {
+          "ruby": 25619.750003291603,
+          "native": 2398.826923476568
+        },
+        "speedup": 10.680116081972873,
+        "iterations": {
+          "ruby": 12,
+          "native": 104
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "partial_sums",
+    "fingerprint": "607cb55977436f7c15e7a748ba2d811b0f14b9002c8d4fa7fcd39f6358423cf9",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            260147.4999974016,
+            255998.9999863319,
+            255701.4999911189,
+            255432.0000053849,
+            255867.5000036601,
+            264120.99998560734,
+            256621.99998623691
+          ],
+          "native": [
+            8811.529410783858,
+            8905.705882866374,
+            8780.38235275787,
+            8819.44117581417,
+            8807.470588876373,
+            8787.794117404916,
+            8842.588234555853
+          ]
+        },
+        "median_us": {
+          "ruby": 255998.9999863319,
+          "native": 8811.529410783858
+        },
+        "speedup": 29.0527317168154,
+        "iterations": {
+          "ruby": 2,
+          "native": 34
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "pidigits",
+    "fingerprint": "6a1bbdf535dfe0110c9d4f9afb4c56405dec32498dedaf08f0f5417228d4de57",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "pidigits",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            43.958297776645956,
+            42.936860070631,
+            42.97834897157379,
+            43.59332338228199,
+            43.24061433413565,
+            43.414569114533144,
+            43.58116467975027
+          ],
+          "native": [
+            95.31215005536008,
+            91.52239641828581,
+            99.45156775252771,
+            90.8952967537784,
+            92.77043673473182,
+            92.69988802308582,
+            91.64865621668574
+          ]
+        },
+        "median_us": {
+          "ruby": 43.414569114533144,
+          "native": 92.69988802308582
+        },
+        "speedup": 0.4683346446300049,
+        "iterations": {
+          "ruby": 9376,
+          "native": 3572
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "rbtree",
+    "fingerprint": "dd4cde33238676d947c30bfa0b6b607e3b435489748e6a439fed7c9199ba8874",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            48569.14285171245,
+            48640.85714299498,
+            48382.8571408854,
+            48346.428566479255,
+            48168.142858360494,
+            48763.99999817035,
+            49425.14285877613
+          ],
+          "native": [
+            12455.239999108016,
+            12370.7600007765,
+            12403.919999487698,
+            12367.079998366535,
+            12428.52000053972,
+            13379.67999977991,
+            12453.199999872595
+          ]
+        },
+        "median_us": {
+          "ruby": 48569.14285171245,
+          "native": 12428.52000053972
+        },
+        "speedup": 3.9078782388895292,
+        "iterations": {
+          "ruby": 7,
+          "native": 25
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "sieve",
+    "fingerprint": "6ad07a53e3f4763f0c499d782ba5294fefbd7df1559eedcd9224dd0926be82ad",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            57520.83333209157,
+            57498.833329494424,
+            57619.33333512085,
+            57840.99999194344,
+            57747.49999788279,
+            58275.33332436966,
+            57999.666673519336
+          ],
+          "native": [
+            6508.021739453239,
+            6540.369565102636,
+            6521.173913548093,
+            6526.478261271815,
+            6545.543478315939,
+            6553.173912992782,
+            6524.717392217692
+          ]
+        },
+        "median_us": {
+          "ruby": 57747.49999788279,
+          "native": 6526.478261271815
+        },
+        "speedup": 8.84818698325512,
+        "iterations": {
+          "ruby": 6,
+          "native": 46
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "so_lists",
+    "fingerprint": "5778cd5cc35ed52ba882a65e3267b9337d0c16d63031c32500299757183901d4",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "so_lists",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            81888.4999898728,
+            81062.00001202524,
+            80426.99999350589,
+            80644.00000148453,
+            86256.99998810887,
+            80882.75000045542,
+            80783.50000141654
+          ],
+          "native": [
+            11865.846154530747,
+            11820.730768914264,
+            11883.153846541132,
+            11862.923077737483,
+            11849.115383273993,
+            11799.923077118225,
+            11850.307693328852
+          ]
+        },
+        "median_us": {
+          "ruby": 80882.75000045542,
+          "native": 11850.307693328852
+        },
+        "speedup": 6.825371297826172,
+        "iterations": {
+          "ruby": 4,
+          "native": 26
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "splay",
+    "fingerprint": "febe023d5994dbb46002387a7b2762dc0956c09f0c5da5750ecad23fc6d90eb4",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            17553.599999519065,
+            17407.64999995008,
+            16137.549999984913,
+            17529.099999228492,
+            17530.049997731112,
+            15895.549999549985,
+            18228.399998042732
+          ],
+          "native": [
+            5606.385963977102,
+            5468.982455663775,
+            5578.842105981159,
+            5708.298245608284,
+            5530.614035179545,
+            5531.350876768364,
+            5498.771930497401
+          ]
+        },
+        "median_us": {
+          "ruby": 17529.099999228492,
+          "native": 5531.350876768364
+        },
+        "speedup": 3.169045028918811,
+        "iterations": {
+          "ruby": 20,
+          "native": 57
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "str_concat",
+    "fingerprint": "b15c1af8c529d807fceebe4e7e93696ad2427774b8b6b3389087b72d82c97b1d",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            74.24988333065005,
+            72.61922538438677,
+            76.49370042387287,
+            74.8579094745523,
+            75.85884273481155,
+            75.2799813316225,
+            75.42837144165094
+          ],
+          "native": [
+            45.75780484347912,
+            38.76522469510191,
+            38.72168556846137,
+            38.29973400521559,
+            37.26795464802346,
+            37.269214616120216,
+            37.55746885388881
+          ]
+        },
+        "median_us": {
+          "ruby": 75.2799813316225,
+          "native": 38.29973400521559
+        },
+        "speedup": 1.9655484114164081,
+        "iterations": {
+          "ruby": 4286,
+          "native": 7143
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "sudoku",
+    "fingerprint": "3f8785b316015a7c20e6fc3a4d43fa3f58c74b6d0f289ce8c9efa55f8fddbfc3",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            11744.384615807436,
+            11676.576922092443,
+            11698.384614786706,
+            11646.423076924224,
+            11684.807693549934,
+            11807.384616426694,
+            11802.692306586183
+          ],
+          "native": [
+            1022.8435375068818,
+            1025.1054420693442,
+            1029.6870747638145,
+            1029.1700679840533,
+            1027.4455783220299,
+            1024.9761903744038,
+            1026.7517006350997
+          ]
+        },
+        "median_us": {
+          "ruby": 11698.384614786706,
+          "native": 1026.7517006350997
+        },
+        "speedup": 11.393586791773163,
+        "iterations": {
+          "ruby": 26,
+          "native": 294
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "tak",
+    "fingerprint": "27617f4a648f3f83c68d1b16761b5b34c5feec9e3801080d42b6d6c968f855d5",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "tak",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            42364.57142646291,
+            42535.57143134198,
+            42991.28571126078,
+            42377.4285757515,
+            42588.5714274565,
+            42409.57142818453,
+            42308.28571598977
+          ],
+          "native": [
+            8301.648649550672,
+            8269.567568031316,
+            8532.540540752078,
+            8341.729730631954,
+            8264.810809664226,
+            8267.189188847771,
+            8414.00000059071
+          ]
+        },
+        "median_us": {
+          "ruby": 42409.57142818453,
+          "native": 8301.648649550672
+        },
+        "speedup": 5.108572190715389,
+        "iterations": {
+          "ruby": 7,
+          "native": 37
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "tarai",
+    "fingerprint": "9f7dffacbe9a7b538e34c5c9c84c943b66642678c888c8b189ad4465727f7184",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "tarai",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            33170.0999988243,
+            35062.000004108995,
+            33035.59999912977,
+            33111.700002336875,
+            33050.99999997765,
+            36925.70000421256,
+            36828.79999978468
+          ],
+          "native": [
+            6905.931818023832,
+            6889.522726520558,
+            6750.636363656006,
+            6799.6136362622065,
+            6778.499999199994,
+            6895.1590907421305,
+            7007.840908375907
+          ]
+        },
+        "median_us": {
+          "ruby": 33170.0999988243,
+          "native": 6889.522726520558
+        },
+        "speedup": 4.814571533546029,
+        "iterations": {
+          "ruby": 10,
+          "native": 44
+        }
+      }
+    ]
+  },
+  {
+    "kernel": "template",
+    "fingerprint": "4f52e01287cf947e8121867e606b8a2230b9d25ba3657fb973861394be22ef25",
+    "abi": {
+      "engine": "ruby",
+      "version": "4.0.3",
+      "patchlevel": 0,
+      "arch": "arm64-darwin25",
+      "host_os": "darwin25",
+      "ruby_api": "4.0.0"
+    },
+    "ruby": "ruby 4.0.3 (2026-04-21 revision 85ddef263a) +YJIT +PRISM [arm64-darwin25]",
+    "yjit": true,
+    "scope": "boundary validation, data copy and calculation; excludes DB and HTTP",
+    "rounds": 7,
+    "warmup": 50,
+    "results": [
+      {
+        "entry": "run",
+        "workload": "bench_inputs",
+        "samples_us": {
+          "ruby": [
+            231071.00001652725,
+            235935.50000805408,
+            234255.4999922868,
+            238896.49999910034,
+            239837.49997569248,
+            232309.4999883324,
+            233192.4999889452
+          ],
+          "native": [
+            44568.42857013856,
+            44877.14285330315,
+            44846.57142477642,
+            44446.85713886948,
+            44694.99999790319,
+            44651.28571194197,
+            46438.428573310375
+          ]
+        },
+        "median_us": {
+          "ruby": 234255.4999922868,
+          "native": 44694.99999790319
+        },
+        "speedup": 5.241201476748553,
+        "iterations": {
+          "ruby": 2,
+          "native": 7
+        }
+      }
+    ]
+  }
+]
